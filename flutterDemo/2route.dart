@@ -52,23 +52,24 @@ class _MyHomePageState extends State<MyHomePage> {
                 //MaterialPageRoute 是Material组件库提供的组件，
                 //它可以针对不同平台，实现与平台页面切换动画风格一致的路由切换动画
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      settings: RouteSettings(
-                          // 包含路由的配置信息，如路由名称、是否初始路由（首页）
-                          name: "新的页面"
-                          // arguments: Object,
-                          ),
-                      builder: (context) {
-                        return RouterTestRoute();
-                      },
-                      // 默认情况下，当入栈一个新路由时，原来的路由仍然会被保存在内存中，
-                      //如果想在路由没用的时候释放其所占用的所有资源，可以设置maintainState为false。
-                      maintainState: false,
-                      // 表示新的路由页面是否是一个全屏的模态对话框，
-                      // 在iOS中，如果fullscreenDialog为true，新页面将会从屏幕底部滑入（而不是水平方向）
-                      fullscreenDialog: false,
-                    ));
+                  context,
+                  MaterialPageRoute(
+                    settings: RouteSettings(
+                        // 包含路由的配置信息，如路由名称、是否初始路由（首页）
+                        name: "新的页面"
+                        // arguments: Object,
+                        ),
+                    builder: (context) {
+                      return RouterTestRoute();
+                    },
+                    // 默认情况下，当入栈一个新路由时，原来的路由仍然会被保存在内存中，
+                    //如果想在路由没用的时候释放其所占用的所有资源，可以设置maintainState为false。
+                    maintainState: false,
+                    // 表示新的路由页面是否是一个全屏的模态对话框，
+                    // 在iOS中，如果fullscreenDialog为true，新页面将会从屏幕底部滑入（而不是水平方向）
+                    fullscreenDialog: false,
+                  ),
+                );
               },
             ),
           ],
