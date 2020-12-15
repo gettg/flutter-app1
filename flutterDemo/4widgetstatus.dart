@@ -82,6 +82,34 @@ class _MystatusState extends State<Mystatus> {
               ));
             },
           ),
+          FlatButton(
+            color: Color.fromARGB(33, 55, 200, 100),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return ContextBarShow();
+                  },
+                ),
+              );
+            },
+            child: Text("context 获取 status"),
+          ),
+          FlatButton(
+            color: Color.fromARGB(33, 55, 200, 100),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return GlobalKeyShowStatus();
+                  },
+                ),
+              );
+            },
+            child: Text("global key 获取 status"),
+          ),
         ],
       ),
     );
@@ -152,6 +180,100 @@ class CupertinoTestRoute extends StatelessWidget {
             onPressed: () {
               Navigator.pop(context);
             }),
+      ),
+    );
+  }
+}
+
+// 通过 context 来获取 status
+// context对象有一个findAncestorStateOfType()方法，
+//该方法可以从当前节点沿着widget树向上查找指定类型的StatefulWidget对应的
+//State对象。
+class ContextBarShow extends StatefulWidget {
+  ContextBarShow({Key key}) : super(key: key);
+
+  @override
+  _ContextBarShowState createState() => _ContextBarShowState();
+}
+
+class _ContextBarShowState extends State<ContextBarShow> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("子树中获取State对象"),
+      ),
+      body: Center(
+        child: Builder(builder: (context) {
+          return RaisedButton(
+            onPressed: () {
+              // 查找父级最近的Scaffold对应的ScaffoldState对象
+
+              //通过context.findAncestorStateOfType获取StatefulWidget的状态的方法是通用的，
+              //我们并不能在语法层面指定StatefulWidget的状态是否私有，
+              //所以在Flutter开发中便有了一个默认的约定：如果StatefulWidget的状态是希望暴露出的，
+              //应当在StatefulWidget中提供一个of静态方法来获取其State对象，
+              //开发者便可直接通过该方法来获取；如果State不希望暴露，则不提供of方法。
+
+              // ScaffoldState _state =context.findAncestorStateOfType<ScaffoldState>();
+              ScaffoldState _state = Scaffold.of(context);
+              //调用ScaffoldState的showSnackBar来弹出SnackBar
+              _state.showSnackBar(
+                SnackBar(
+                  // 底部的弹窗提示信息
+                  content: Text("我是SnackBar"),
+                ),
+              );
+            },
+            child: Text("显示SnackBar"),
+          );
+        }),
+      ),
+    );
+  }
+}
+
+// 通过 GlobalKey 获取
+// 使用GlobalKey开销较大，如果有其他可选方案，应尽量避免使用它。
+//另外同一个GlobalKey在整个widget树中必须是唯一的，不能重复
+class GlobalKeyShowStatus extends StatefulWidget {
+  GlobalKeyShowStatus({Key key}) : super(key: key);
+
+  @override
+  _GlobalKeyShowStatusState createState() => _GlobalKeyShowStatusState();
+}
+
+class _GlobalKeyShowStatusState extends State<GlobalKeyShowStatus> {
+  //定义一个globalKey, 由于GlobalKey要保持全局唯一性，我们使用静态变量存储
+  static GlobalKey<ScaffoldState> _globalKey = GlobalKey();
+
+// 如果一个widget设置了GlobalKey，那么我们便可以通过globalKey.currentWidget获得
+//该widget对象、globalKey.currentElement来获得widget对应的element对象，
+//如果当前widget是StatefulWidget，
+//则可以通过globalKey.currentState来获得该widget对应的state对象。
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: _globalKey, //设置key
+      appBar: AppBar(
+        title: Text("通过 GlobalKey 获取State对象"),
+      ),
+      body: Center(
+        child: Builder(builder: (context) {
+          return RaisedButton(
+            onPressed: () {
+              ScaffoldState _state = _globalKey.currentState;
+              //调用ScaffoldState的showSnackBar来弹出SnackBar
+              _state.showSnackBar(
+                SnackBar(
+                  // 底部的弹窗提示信息
+                  content: Text("我是SnackBar"),
+                ),
+              );
+            },
+            child: Text("通过 GlobalKey 获取State对象"),
+          );
+        }),
       ),
     );
   }
