@@ -10,6 +10,9 @@ class ButtonIndex extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "button",
+      routes: {
+        "switch_button": (context) => SwitchButton(),
+      },
       home: BHome(),
     );
   }
@@ -117,7 +120,11 @@ class _BHomeState extends State<BHome> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20.0)),
             onPressed: _showDouble,
-          )
+          ),
+          RaisedButton(
+            child: Text("switch Button"),
+            onPressed: () => Navigator.pushNamed(context, "switch_button"),
+          ),
         ],
       ),
     );
@@ -144,5 +151,81 @@ class _BHomeState extends State<BHome> {
   @required this.child, //按钮的内容
 })""");
     // Fluttertoast.cancel(); // 直接退出的方法
+  }
+}
+
+class SwitchButton extends StatefulWidget {
+  SwitchButton({Key key}) : super(key: key);
+
+  @override
+  _SwitchButtonState createState() => _SwitchButtonState();
+}
+
+class _SwitchButtonState extends State<SwitchButton> {
+  bool _switchSelected = true; //维护单选开关状态
+
+  bool _checkboxSelected = true; //维护复选框状态
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          "Switch button 的案例",
+          style: TextStyle(color: Colors.black26),
+        ),
+      ),
+      body: Column(
+        children: [
+          Row(
+            children: [
+              Switch(
+                value: _switchSelected, //当前状态
+                onChanged: (value) {
+                  //重新构建页面
+                  setState(() {
+                    _switchSelected = value;
+                  });
+                },
+              ),
+              Text("$_switchSelected"),
+              Switch(
+                value: _checkboxSelected, //当前状态
+                onChanged: (value) {
+                  //重新构建页面
+                  setState(() {
+                    _checkboxSelected = value;
+                  });
+                },
+              ),
+              Text("$_checkboxSelected"),
+            ],
+          ),
+          Row(
+            children: [
+              Checkbox(
+                value: _checkboxSelected,
+                activeColor: Colors.red, //选中时的颜色
+                onChanged: (value) {
+                  setState(() {
+                    _checkboxSelected = value;
+                  });
+                },
+              ),
+              Text("$_checkboxSelected"),
+              Checkbox(
+                value: _switchSelected,
+                activeColor: Colors.red, //选中时的颜色
+                onChanged: (value) {
+                  setState(() {
+                    _switchSelected = value;
+                  });
+                },
+              ),
+              Text("$_switchSelected"),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
