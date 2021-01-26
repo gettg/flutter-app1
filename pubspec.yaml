@@ -42,9 +42,8 @@ dev_dependencies:
 # The following section is specific to Flutter.
 flutter:
 
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
+  # 自带的一套Material Design的字体图标 
+  # 图标官网 ： https://material.io/resources/icons/?style=baseline
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
@@ -93,3 +92,7 @@ flutter:
   #   - family: AbrilFatface
   #     fonts:
   #       - asset: assets/fonts/abrilfatface/AbrilFatface-Regular.ttf
+  fonts:
+  - family: myIcon  #指定一个字体名
+    fonts:
+      - asset: assets\fonts\iconfont.ttf
