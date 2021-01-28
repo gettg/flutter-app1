@@ -14,6 +14,20 @@ class inPutApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "输入框",
+      // // 处理Named页面跳转 传递参数                        无效
+      // onGenerateRoute: (RouteSettings setting) {
+      //   if (setting.name == 'two2') {
+      //     return MaterialPageRoute(
+      //         builder: (context) =>
+      //             FocusTestRoute(isPage: setting.arguments['isPage']));
+      //   }
+      // },
+
+      routes: {
+        "two2": (context) => FocusTestRoute(
+              isPage: true,
+            ), // 指定参数信息，进行跳转，可使用不同的参数代表不同的路由
+      },
       home: HomeInput(),
     );
   }
@@ -150,7 +164,100 @@ class _TextFieldInputState extends State<TextFieldInput> {
           decoration: InputDecoration(
               labelText: "select", icon: Icon(Icons.ac_unit_rounded)),
         ),
+        RaisedButton(
+          child: Text("two"),
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              // MaterialPageRoute 传递参数 （笨方法）
+              builder: (context) => FocusTestRoute(
+                isPage: true,
+              ),
+            ),
+          ),
+        ),
+        // 填充到框中
+        Container(
+          child: FocusTestRoute(),
+        ),
       ],
     );
+  }
+}
+
+class FocusTestRoute extends StatefulWidget {
+  const FocusTestRoute({Key key, this.isPage = false}) : super(key: key);
+
+// 是否是页面
+  final bool isPage;
+  @override
+  _FocusTestRouteState createState() => new _FocusTestRouteState();
+}
+
+class _FocusTestRouteState extends State<FocusTestRoute> {
+  FocusNode focusNode1 = new FocusNode();
+  FocusNode focusNode2 = new FocusNode();
+  FocusScopeNode focusScopeNode;
+
+  Widget getPadding() {
+    return Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        children: <Widget>[
+          TextField(
+            autofocus: true,
+            focusNode: focusNode1, //关联focusNode1
+            decoration: InputDecoration(labelText: "input1"),
+          ),
+          TextField(
+            focusNode: focusNode2, //关联focusNode2
+            decoration: InputDecoration(labelText: "input2"),
+          ),
+          Builder(
+            builder: (ctx) {
+              return Column(
+                children: <Widget>[
+                  RaisedButton(
+                    child: Text("移动焦点到 2"),
+                    onPressed: () {
+                      //将焦点从第一个TextField移到第二个TextField
+                      // 这是一种写法 FocusScope.of(context).requestFocus(focusNode2);
+                      // 这是第二种写法
+                      if (null == focusScopeNode) {
+                        focusScopeNode = FocusScope.of(context);
+                      }
+                      if (focusNode2.hasFocus) {
+                        print("-----------focusNode2 is focus");
+                      } else {
+                        focusScopeNode.requestFocus(focusNode2);
+                      }
+                    },
+                  ),
+                  RaisedButton(
+                    child: Text("隐藏键盘,取消所有焦点"),
+                    onPressed: () {
+                      // 当所有编辑框都失去焦点时键盘就会收起
+                      focusNode1.unfocus();
+                      focusNode2.unfocus();
+                    },
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.isPage) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: getPadding(),
+      );
+    }
+    return getPadding();
   }
 }
