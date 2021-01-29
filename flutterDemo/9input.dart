@@ -180,6 +180,84 @@ class _TextFieldInputState extends State<TextFieldInput> {
         Container(
           child: FocusTestRoute(),
         ),
+        //
+        Container(
+          child: ThemeInput(),
+        )
+      ],
+    );
+  }
+}
+
+// 由于TextField在绘制下划线时使用的颜色是主题色里面的hintColor，
+//但提示文本颜色也是用的hintColor， 如果我们直接修改hintColor，
+//那么下划线和提示文本的颜色都会变。值得高兴的是decoration中可以设置hintStyle，
+//它可以覆盖hintColor，并且主题中可以通过inputDecorationTheme来设置输入框默认的decoration。
+//所以我们可以通过主题来自定义，
+class ThemeInput extends StatefulWidget {
+  ThemeInput({Key key}) : super(key: key);
+
+  @override
+  _ThemeInputState createState() => _ThemeInputState();
+}
+
+class _ThemeInputState extends State<ThemeInput> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Theme(
+          // 默认的样式信息
+          data: Theme.of(context).copyWith(
+            hintColor: Colors.grey[200], //定义下划线颜色
+            inputDecorationTheme: InputDecorationTheme(
+                labelStyle: TextStyle(color: Colors.grey), //定义label字体样式
+                hintStyle:
+                    TextStyle(color: Colors.grey, fontSize: 20.0) //定义提示文本样式
+                ),
+          ),
+          child: Column(
+            children: <Widget>[
+              TextField(
+                decoration: InputDecoration(
+                  labelText: "用户名",
+                  hintText: "用户名或邮箱",
+                  prefixIcon: Icon(Icons.person),
+                ),
+              ),
+              TextField(
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.lock),
+                  labelText: "密码",
+                  hintText: "您的登录密码",
+                  // 组件自己的样式，覆盖默认的样式
+                  hintStyle: TextStyle(color: Colors.grey, fontSize: 13.0),
+                ),
+                obscureText: true,
+              ),
+            ],
+          ),
+        ),
+        // 以上 成功的自定义了下划线颜色和提问文字样式，细心的读者可能已经发现，、
+        //通过这种方式自定义后，输入框在获取焦点时，labelText不会高亮显示了，
+        //正如上图中的"用户名"本应该显示蓝色，但现在却显示为灰色，并且我们还是无法定义下划线宽度。
+        //另一种灵活的方式是直接隐藏掉TextField本身的下划线，然后通过Container去嵌套定义样式，
+
+        // DO 优先通过decoration来自定义样式，如果decoration实现不了，再用widget组合的方式
+        Container(
+          child: TextField(
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                  labelText: "Email",
+                  hintText: "电子邮件地址",
+                  prefixIcon: Icon(Icons.email),
+                  border: InputBorder.none //隐藏下划线
+                  )),
+          decoration: BoxDecoration(
+              // 下滑线浅灰色，宽度1像素
+              border: Border(
+                  bottom: BorderSide(color: Colors.grey[200], width: 1.0))),
+        )
       ],
     );
   }
@@ -195,6 +273,7 @@ class FocusTestRoute extends StatefulWidget {
 }
 
 class _FocusTestRouteState extends State<FocusTestRoute> {
+  // FocusNode继承自ChangeNotifier，通过FocusNode可以监听焦点的改变事件，
   FocusNode focusNode1 = new FocusNode();
   FocusNode focusNode2 = new FocusNode();
   FocusScopeNode focusScopeNode;
@@ -245,13 +324,40 @@ class _FocusTestRouteState extends State<FocusTestRoute> {
               );
             },
           ),
+          TextField(
+            decoration: InputDecoration(
+              labelText: "请输入用户名",
+              prefixIcon: Icon(Icons.person),
+              // 未获得焦点下划线设为灰色
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.red),
+              ),
+              //获得焦点下划线设为蓝色
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.blue),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
   @override
+  void initState() {
+    // 监听添加到 build 和 init status 同样的效果
+    super.initState();
+    focusNode1.addListener(() {
+      print("add listener :${focusNode1.hasFocus}");
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // focusNode1.addListener(() {
+    //   print("add listener :${focusNode1.hasFocus}");
+    // });
+
     if (widget.isPage) {
       return Scaffold(
         appBar: AppBar(),
